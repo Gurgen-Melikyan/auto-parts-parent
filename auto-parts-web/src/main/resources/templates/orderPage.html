@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders Page</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .order-details {
+            font-weight: bold;
+        }
+        .total-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .empty-cart {
+            color: #f00;
+            font-weight: bold;
+        }
+        .to-order-btn {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div th:if="${cart != null}">
+    <h1>Shopping Cart</h1>
+    <div th:each="product : ${productInCart}" class="product">
+        <div class="order-details">
+            Title: <span th:text="${product.title}"></span><br>
+            Price: $<span th:text="${product.price}"></span><br>
+            <img th:if="${product.getImgName() != null}"
+                 th:src="@{/getImage(imageName=${product.getImgName()})}" width="55"/>
+        </div>
+    </div>
+    <div class="total-amount">
+        Total Amount: $<span th:text="${sum}"></span>
+    </div>
+    <form th:action="@{/orders/add(id=${cart.id})}" method="post">
+        <input type="submit" value="Place Order" class="to-order-btn">
+    </form>
+</div>
+<div th:if="${cart == null}" class="empty-cart">
+    You do not have any items in your cart.
+</div>
+<a href="/products">Back to Products</a>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Orders Page</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div th:if="${cart != null}">-->
+<!--    <div th:each="product: ${productInCart}">-->
+<!--        title - <span th:text="${product.title}"></span><br>-->
+<!--        price - <span th:text="${product.price}"></span><br>-->
+<!--<img th:if="${product.getImgName() != null}"-->
+<!--     th:src="@{/getImage(imageName=${product.getImgName()})}" width="55"/>-->
+<!--    </div>-->
+<!--    sum - <span th:text="${sum}"></span><br>-->
+<!--    <form th:action="@{/orders/add(id=${cart.id})}" method="post">-->
+<!--        <input type="submit" value="To Order">-->
+<!--    </form>-->
+<!--</div>-->
+<!--<div th:if="${cart == null}">-->
+<!--    You do not have a order-->
+<!--</div>-->
+<!--<a href="/products"></a>-->
+<!--</body>-->
+<!--</html>-->

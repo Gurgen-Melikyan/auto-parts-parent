@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Single Item</title>
+    <link rel="stylesheet" href="/css/single.css">
+</head>
+<body>
+<div class="container">
+    <a href="/products">Back</a><br>
+
+    <h5>Id</h5>
+    <h2 th:text="${product.id}"></h2>
+
+    <h5>Description</h5>
+    <p th:text="${product.description}"></p>
+
+    <h5>Category Name</h5>
+    <span th:if="${product.category != null}" th:text="${product.category.name}"></span>
+
+    <h5>User Name</h5>
+    <span th:text="${product.getUser().getName()}">User Name</span>
+
+    <form action="/products/comment/add" method="post">
+        <input type="hidden" name="product.id" th:value="${product.id}"/>
+        <textarea name="comment" placeholder="Add a comment"></textarea>
+        <input type="submit" value="Add">
+    </form>
+
+    <div class="comments-list">
+        <div class="comment" th:each="comment : ${commentsList}">
+            <p>Comment: <span th:text="${comment.comment}"></span></p>
+            <p>Author: <span th:text="${comment.user.name}"></span></p>
+            <a th:href="@{/products/comment/remove(id=${comment.id})}">Delete</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head xmlns:th="http://www.thymeleaf.org">
+    <meta charset="UTF-8">
+    <title>Categories</title>
+    <link rel="stylesheet" href="/css/categories.css">
+</head>
+<body>
+<h1>Categories</h1>
+<div class="header">
+    <a href="/categories/add">Create Category</a>
+</div>
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Action</th>
+        <th>Update</th>
+    </tr>
+    <tr th:each="category : ${categories.content}">
+        <td th:text="${category.id}"></td>
+        <td th:text="${category.name}"></td>
+        <td><a th:href="@{/categories/remove(id=${category.id})}">Delete</a></td>
+        <td><a th:href="@{/categories/edit(id=${category.id})}">Update</a></td>
+    </tr>
+</table>
+<div class="pagination">
+    <div th:if="${categories.totalPages > 0}" th:each="pageNumber : ${pageNumbers}">
+        <a th:href="@{/categories(size=${categories.size}, page=${pageNumber})}"
+           th:text="${pageNumber}"
+           th:class="${pageNumber == categories.number + 1 ? 'active' : ''}"></a>
+    </div>
+</div>
+</body>
+</html>

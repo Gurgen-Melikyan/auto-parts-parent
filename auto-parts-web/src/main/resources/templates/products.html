@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+    <link rel="stylesheet" href="/css/products.css">
+    <style>
+        /* CSS styles to center align the button */
+        .center {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Products</h1>
+<div class="header">
+    <a href="/products/add">Create Product</a>
+
+    <a href="/orders">Order Page</a>
+
+</div>
+<table>
+    <tr>
+        <th>Image</th>
+        <th>Price</th>
+        <th>Title</th>
+        <th>Action</th>
+        <th>Update</th>
+        <th>Add to cart</th>
+    </tr>
+    <form action="/products/cart/add" method="post" class="checkbox-container">
+        <tr th:each="product : ${products.content}">
+            <td>
+                <a th:href="@{'/products/' + ${product.id}}">
+                    <img th:if="${product.getImgName() != null}"
+                         th:src="@{/getImage(imageName=${product.getImgName()})}" width="55"/>
+                </a>
+            </td>
+            <td th:text="${product.price}"></td>
+            <td th:text="${product.title}"></td>
+            <td><a th:href="@{/products/remove(id=${product.id})}">Delete</a></td>
+            <td><a th:href="@{/products/edit(id=${product.id})}">Update</a></td>
+            <td>
+                <label>Add to Cart</label>
+                <input type="checkbox" name="prod" th:value="${product.id}">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" class="center">
+                <input type="submit" value="AddToCart">
+            </td>
+        </tr>
+    </form>
+</table>
+<div class="pagination">
+    <div th:if="${products.totalPages > 0}" th:each="pageNumber : ${pageNumbers}">
+        <a th:href="@{/products(size=${products.size}, page=${pageNumber})}" th:text="${pageNumber}"
+           th:class="${pageNumber == products.number + 1 ? 'active' : ''}"></a>
+    </div>
+</div>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Products</title>-->
+<!--    <link rel="stylesheet" href="/css/products.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Products</h1>-->
+<!--<div class="header">-->
+<!--    <a href="/products/add">Create Product</a>-->
+<!--</div>-->
+<!--<table>-->
+<!--    <tr>-->
+<!--        <th>Image</th>-->
+<!--        <th>Price</th>-->
+<!--        <th>Title</th>-->
+<!--        <th>Action</th>-->
+<!--        <th>Update</th>-->
+<!--        <th>Add to cart</th>-->
+<!--    </tr>-->
+<!-- <form action="/products/cart/add" method="post" class="checkbox-container">-->
+<!--    <tr th:each="product : ${products.content}">-->
+<!--        <td>-->
+<!--            <a th:href="@{'/products/' + ${product.id}}">-->
+<!--                <img th:if="${product.getImgName() != null}" th:src="@{/getImage(imageName=${product.getImgName()})}" width="55"/>-->
+<!--            </a>-->
+<!--        </td>-->
+<!--        <td th:text="${product.price}"></td>-->
+<!--        <td th:text="${product.title}"></td>-->
+<!--        <td><a th:href="@{/products/remove(id=${product.id})}">Delete</a></td>-->
+<!--        <td><a th:href="@{/products/edit(id=${product.id})}">Update</a></td>-->
+<!--        <td>-->
+<!--            <label>Add to Cart</label>-->
+<!--            <input type="checkbox" name="prod" th:value="${product.id}">-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--     <input type="submit" value="Add" style="margin-left: 10px;">-->
+<!-- </form>-->
+<!--</table>-->
+<!--<div class="pagination">-->
+<!--    <div th:if="${products.totalPages > 0}" th:each="pageNumber : ${pageNumbers}">-->
+<!--        <a th:href="@{/products(size=${products.size}, page=${pageNumber})}" th:text="${pageNumber}" th:class="${pageNumber == products.number + 1 ? 'active' : ''}"></a>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!--<form action="/products/cart/add" method="post" class="checkbox-container">-->
+<!--    <div th:each="produc : ${products}">-->
+<!--        <span th:text="${produc.title}"></span>-->
+
+<!--        <label>Add to Cart</label>-->
+<!--        <input type="submit" value="Add" style="margin-left: 10px;">-->
+<!--        <input type="checkbox" name="prod" th:value="${produc.id}">-->
+<!--    </div>-->
+<!--    <input type="submit" value="create">-->
+<!--</form>-->
