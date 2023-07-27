@@ -50,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
         orders.setDateTime(new Date());
         orders.setProductList(productsInCart);
         cartService.emptyCart(cartId);
-        ordersRepository.save(orders);
 
     }
 

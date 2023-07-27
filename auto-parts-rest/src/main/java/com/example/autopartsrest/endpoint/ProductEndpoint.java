@@ -3,15 +3,14 @@ package com.example.autopartsrest.endpoint;
 import com.example.autopartscommon.entity.*;
 import com.example.autopartscommon.repository.CartRepository;
 import com.example.autopartscommon.repository.CommentsRepository;
+import com.example.autopartscommon.repository.CurrencyRepository;
 import com.example.autopartscommon.repository.ProductRepository;
 import com.example.autopartsrest.dto.*;
 import com.example.autopartsrest.mapper.CommentMapper;
 import com.example.autopartsrest.mapper.ProductMapper;
 import com.example.autopartsrest.security.CurrentUser;
-import com.example.autopartsrest.service.CartService;
-import com.example.autopartsrest.service.CategoryService;
-import com.example.autopartsrest.service.CommentService;
-import com.example.autopartsrest.service.ProductService;
+import com.example.autopartsrest.service.*;
+import com.example.autopartsrest.util.RoundUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +18,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +44,7 @@ public class ProductEndpoint {
     private final CommentService commentService;
     private final ProductMapper productMapper;
     private final CartService cartService;
+    private final CurrencyService currencyService;
 
     @Value("${upload.image.path}")
     private String uploadPath;
@@ -129,18 +132,26 @@ public class ProductEndpoint {
         if (all.size() == 0) {
             return ResponseEntity.notFound().build();
         }
-        List<ProductDto> productDtos = new ArrayList<>();
-        for (Product product : all) {
-            productDtos.add(productMapper.mapToDto(product));
+        List<ProductDto> productDtos = productMapper.mapToList(all);
+        List<Currency> currencies = currencyService.findAll();
+        if (currencies != null && !currencies.isEmpty()) {
+            Currency currency = currencies.get(0);
+            for (ProductDto productDto : productDtos) {
+                double price = productDto.getPrice();
+                productDto.setPriceRUB(RoundUtil.round(price / currency.getRub(), 1));
+                productDto.setPriceUSD(RoundUtil.round(price / currency.getUsd(), 2));
+            }
         }
+
         return ResponseEntity.ok(productDtos);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> update(@PathVariable("id") int id,
                                              @RequestBody UpdateProductDto updateProductDto,
                                              @AuthenticationPrincipal CurrentUser currentUser) {
-       Product byId = productService.findById(id);
+        Product byId = productService.findById(id);
         if (byId == null) {
             return ResponseEntity.notFound().build();
         }
@@ -171,7 +182,7 @@ public class ProductEndpoint {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> singleProduct(@PathVariable("id") int id) {
-      Product byId = productService.findById(id);
+        Product byId = productService.findById(id);
         if (byId == null) {
             return ResponseEntity.notFound().build();
         }
@@ -190,7 +201,7 @@ public class ProductEndpoint {
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<?> removeComment(@PathVariable("id") int id, @AuthenticationPrincipal CurrentUser currentUser) {
-       Comments byId = commentService.findById(id);
+        Comments byId = commentService.findById(id);
         if (byId != null) {
             return ResponseEntity.notFound().build();
         }

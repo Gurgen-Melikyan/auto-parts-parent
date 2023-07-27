@@ -108,4 +108,20 @@
     <changeSet id="changeNameEnableToUser" author="gmelikyan">
         <renameColumn tableName="user" oldColumnName="enable" newColumnName="enabled" columnDataType="boolean"/>
     </changeSet>
+    <changeSet id="createCurrencyTable" author="gmelikyan">
+        <createTable tableName="currency">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="rub" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="usd" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
