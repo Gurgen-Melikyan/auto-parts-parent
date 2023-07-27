@@ -1,4 +1,4 @@
-package com.example.autopartsweb.service;
+package com.example.autopartsrest.service;
 
 
 import com.example.autopartscommon.entity.Cart;
@@ -8,7 +8,6 @@ import com.example.autopartscommon.entity.User;
 import java.util.List;
 
 public interface CartService {
-    void addToCart(List<Integer> products, User currentUser);
 
     Cart getCartByUserId(int userId);
 
@@ -18,6 +17,7 @@ public interface CartService {
 
     void emptyCart(int cartId);
 
-
     void removeById(int id);
+
+    Cart addToCart(Integer productId, User user);
 }

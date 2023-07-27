@@ -37,9 +37,9 @@ public class MainController {
         if (currentUser != null) {
             User user = currentUser.getUser();
             if (user.getRole() == Role.ADMIN) {
-                return "redirect:/";
+                return "redirect:/categories";
             } else if (user.getRole() == Role.USER) {
-                return "redirect:/";
+                return "redirect:/products";
             }
         }
         return "redirect:/";

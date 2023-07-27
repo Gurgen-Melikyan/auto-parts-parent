@@ -1,4 +1,4 @@
-package com.example.autopartsweb.service;
+package com.example.autopartsrest.service;
 
 
 
@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<User> findAllUsers();
+
+    List<User> findUsers();
     Optional<User> findById(int id);
-    void verifyUser(String email,String token);
-    User save(User user);
+    User addUser(User user);
     void deleteById(int id);
+    Optional<User> findByEmail(String email);
+
+    boolean existsById(int id);
 }
