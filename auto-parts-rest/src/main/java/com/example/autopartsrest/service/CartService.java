@@ -4,6 +4,7 @@ package com.example.autopartsrest.service;
 import com.example.autopartscommon.entity.Cart;
 import com.example.autopartscommon.entity.Product;
 import com.example.autopartscommon.entity.User;
+import com.example.autopartsrest.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -19,5 +20,5 @@ public interface CartService {
 
     void removeById(int id);
 
-    Cart addToCart(Integer productId, User user);
+    Cart addToCart(Integer productId, User user) throws EntityNotFoundException;
 }

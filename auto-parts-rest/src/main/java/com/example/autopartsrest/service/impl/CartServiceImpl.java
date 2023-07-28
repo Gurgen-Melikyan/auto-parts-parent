@@ -6,6 +6,7 @@ import com.example.autopartscommon.entity.User;
 import com.example.autopartscommon.repository.CartRepository;
 import com.example.autopartscommon.repository.ProductRepository;
 import com.example.autopartscommon.repository.UserRepository;
+import com.example.autopartsrest.exception.EntityNotFoundException;
 import com.example.autopartsrest.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart addToCart(Integer productId, User user) {
+    public Cart addToCart(Integer productId, User user) throws EntityNotFoundException {
         List<Product> productList = new ArrayList<>();
         Cart cart = cartRepository.findByUser_Id(user.getId());
         if (cart == null) {
@@ -59,7 +60,7 @@ public class CartServiceImpl implements CartService {
         }
         Optional<Product> byId = productRepository.findById(productId);
         if (byId.isEmpty()) {
-            return null;
+            throw new EntityNotFoundException("not found");
         }
         Product product = byId.get();
         productList = cart.getProductList();

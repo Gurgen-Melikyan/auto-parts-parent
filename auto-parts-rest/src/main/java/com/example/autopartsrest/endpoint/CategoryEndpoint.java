@@ -6,6 +6,8 @@ import com.example.autopartsrest.dto.CategoryDto;
 import com.example.autopartsrest.dto.CreateCategoryRequestDto;
 import com.example.autopartsrest.dto.CreateCategoryResponseDto;
 import com.example.autopartsrest.dto.UpdateCategoryDto;
+import com.example.autopartsrest.exception.EntityNotFoundException;
+import com.example.autopartsrest.exception.UserUnauthorizedException;
 import com.example.autopartsrest.mapper.CategoryMapper;
 import com.example.autopartsrest.security.CurrentUser;
 import com.example.autopartsrest.service.CategoryService;
@@ -28,63 +30,31 @@ import java.util.Optional;
 @RequestMapping("categories")
 public class CategoryEndpoint {
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
+
 
     @PostMapping("/add")
-    public ResponseEntity<CreateCategoryResponseDto> create(@RequestBody CreateCategoryRequestDto requestDto) {
-        Optional<Category> byName = categoryService.findByName(requestDto.getName());
-        if (byName.isEmpty()) {
-            Category category = categoryMapper.map(requestDto);
-            categoryService.save(category);
-            return ResponseEntity.ok(categoryMapper.map(category));
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-
+    public ResponseEntity<CreateCategoryResponseDto> create(@RequestBody CreateCategoryRequestDto requestDto) throws EntityNotFoundException {
+        return ResponseEntity.ok(categoryService.createCategory(requestDto));
     }
 
     @GetMapping
     private ResponseEntity<List<CategoryDto>> getAll(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size) {
-        Sort sort = Sort.by(Sort.Order.desc("id"));
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Category> result = categoryService.findAll(pageable);
+            @RequestParam(value = "size", defaultValue = "20") int size) throws EntityNotFoundException {
+        return ResponseEntity.ok(categoryService.getAllCategories(page, size));
 
-        List<Category> all = result.getContent();
-        if (all.size() == 0) {
-            return ResponseEntity.notFound().build();
-        }
-        List<CategoryDto> categoryDtos = new ArrayList<>();
-        for (Category category : all) {
-            categoryDtos.add(categoryMapper.mapToDto(category));
-        }
-        return ResponseEntity.ok(categoryDtos);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> update(@PathVariable("id") int id, @RequestBody UpdateCategoryDto updateCategoryDto,
-                                              @AuthenticationPrincipal CurrentUser currentUser) {
-        Category categoryFromDb = categoryService.findById(id);
-        if (categoryFromDb == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (currentUser.getUser().getRole() != Role.ADMIN) {
-            return ResponseEntity.notFound().build();
-        }
-        Category category = categoryMapper.mapUpdate(updateCategoryDto);
-        if (category.getName() != null) {
-            categoryFromDb.setName(category.getName());
-        }
-        return ResponseEntity.ok(categoryMapper.mapToDto(categoryService.save(categoryFromDb)));
+                                              @AuthenticationPrincipal CurrentUser currentUser) throws EntityNotFoundException, UserUnauthorizedException {
+        return ResponseEntity.ok(categoryService.updateCategory(id, updateCategoryDto, currentUser.getUser()));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable("id") int id) {
-        if (categoryService.existsById(id)) {
-            categoryService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteById(@PathVariable("id") int id, @AuthenticationPrincipal CurrentUser currentUser) throws EntityNotFoundException, UserUnauthorizedException {
+        categoryService.deleteCategoryById(id, currentUser.getUser());
+        return ResponseEntity.ok().build();
     }
 }
 
